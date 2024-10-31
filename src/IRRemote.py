@@ -161,7 +161,8 @@ class IRRemoteSAO():
     def set_ir_write_cache_byte(self, address, byte) -> None:
         """
         Set SAO write cache address and byte.
-        This will trigger the IR Transmitter to send cached address and byte.
+        When Button is used, the IR Transmitter will send cached address and byte.
+        Otherwise this cache is ignored.
         """
         send = bytes([IRRemoteSAO.SET_IR_WRITE_CACHE_COMMAND_ID, address]) + byte
         self.__send_i2c(send)
