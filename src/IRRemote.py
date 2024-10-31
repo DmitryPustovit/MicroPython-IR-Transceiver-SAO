@@ -4,6 +4,7 @@ __version__ = "1.0.0"
 
 class IRRemoteSAO():
     PING_COMMAND_ID=0
+    SET_IGNORE_IR_REFLECTIONS_COMMAND_ID=1
     SET_IR_MODE_COMMAND_ID=2
     ENABLE_IR_BUFFER_COMMAND_ID=3
     SET_IR_ADDRESS_COMMAND_ID=4
@@ -61,7 +62,7 @@ class IRRemoteSAO():
         if ir_mode not in (0, 1):
             raise ValueError("IR Reflection must be either 0 (Disabled) or 1 (Enabled).")
 
-        send = bytes([IRRemoteSAO.SET_IR_ADDRESS_COMMAND_ID, ir_mode])
+        send = bytes([IRRemoteSAO.SET_IGNORE_IR_REFLECTIONS_COMMAND_ID, ir_mode])
         self.__send_i2c(send)
         time.sleep(.1)
     
