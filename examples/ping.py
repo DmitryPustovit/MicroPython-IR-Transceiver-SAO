@@ -1,5 +1,5 @@
 import machine
-from src.IRRemote import IRRemoteSAO
+from IRRemote import IRRemoteSAO
 
 device_i2c_address = 0x08 
 
