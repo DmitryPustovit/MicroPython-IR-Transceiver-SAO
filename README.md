@@ -1,6 +1,8 @@
 # MicroPython-IR-Transceiver-SAO
+Send and Recieve IR data with your SAO easily!   
+
 Driver for the [IR-Transceiver-SAO](https://github.com/alecjprobst/IR-Transceiver-SAO).  
-Send and Recieve IR data with your SAO easily!  
+For specific docs about the the IR-Transceiver-SAO, head over the IR-Transceiver-SAO project.
 
 ## Getting Started
 
@@ -16,3 +18,4 @@ i2c = machine.I2C(0, scl=machine.Pin(1), sda=machine.Pin(0))
 tvRemoteSAO = IRRemoteSAO(i2c, device_i2c_address )
 print(tvRemoteSAO.ping())
 ```
+
