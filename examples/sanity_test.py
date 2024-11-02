@@ -14,7 +14,6 @@ tvRemoteSAO = IRRemoteSAO(i2c, device_i2c_address)
 
 def input_check(value):
     if value > 255 or value < 0:
-        print("Error: input must be an integer between 0 and 255")
         return False
     return True
 
@@ -22,19 +21,26 @@ def sanity_check():
     print("What IR Address do you want to be? (0-255)")
     this_sao_ir_address = int(sys.stdin.readline())
     if not input_check(this_sao_ir_address):
+        print("Error: input must be an integer between 0 and 255")
         return
     print("What IR Address do you want to send to? (0-255)")
     target_sao_ir_address = int(sys.stdin.readline())
     if not input_check(target_sao_ir_address):
+        print("Error: input must be an integer between 0 and 255")
         return
+    if target_sao_ir_address == this_sao_ir_address:
+        print("Warning: target_sao_address should not be equal to this_sao_address as reflections can cause false positives")
     print("What data do you want to send to the other SAO? (0-255)")
     data_to_send = int(sys.stdin.readline())
     if not input_check(data_to_send):
+        print("Error: input must be an integer between 0 and 255")
         return
     print("What data do you want to receive from the other SAO? (0-255)")
     data_to_receive = int(sys.stdin.readline())
     if not input_check(data_to_receive):
+        print("Error: input must be an integer between 0 and 255")
         return
+    '''
     print("Are you sending data first? (y/n)")
     send_first_char = str(sys.stdin.readline())
     if send_first_char.strip().lower() == 'y':
@@ -44,7 +50,7 @@ def sanity_check():
     else:
         print("Error: input must be 'y' or 'n'")
         return
-
+    '''
     print("\n---SAO Setup---")
     # Test that SAO responds
     ping_response = tvRemoteSAO.ping()
@@ -84,27 +90,20 @@ def sanity_check():
     # Make sure receive data is always wrong the first check
     received_data = data_to_receive + 1
 
-    if send_first:
-        # Constantly send IR data while seeing if we receive expected data back (Tests if the send and receive works )
-        print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + " and waiting for response of value " + str(data_to_receive)+ " at this SAO's address of " + str(this_sao_ir_address))
-        while received_data != data_to_receive:
-            while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
-                tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
-                print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
-                sleep(0.5)
-            
-            received_data = int.from_bytes(tvRemoteSAO.read_ir_byte(), 'big')
-            if received_data != data_to_receive:
-                print("Incorrect received data of value " + str(received_data))
-            else:
-                # Send 20 IR outputs (Validates that the other SAO transmit is working)
-                print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + ", note that this will only send 20 times before ending")
-                for i in range(0, 20):
-                    tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
-                    print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
-                print("Success! Sanity Test Passed, IR SAO communication works correctly")
-                print("---END---")
-
+    # Constantly send IR data while seeing if we receive expected data back (Tests if the send and receive works )
+    print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + " and waiting for response of value " + str(data_to_receive)+ " at this SAO's address of " + str(this_sao_ir_address))
+    while received_data != data_to_receive:
+        while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
+            tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
+            print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
+            sleep(0.5)
+        
+        received_data = int.from_bytes(tvRemoteSAO.read_ir_byte(), 'big')
+        if received_data != data_to_receive:
+            print("Incorrect received data of value " + str(received_data))
+        else:
+            print("Success! This IR SAO works correctly for receiving! If the other SAO has sucess, transmitting works as well!")
+    '''
     else:
         # Constantly check to see if received IR data
         print("Waiting to receive IR data " + str(data_to_receive) + " at this SAO's address " + str(this_sao_ir_address))
@@ -118,10 +117,12 @@ def sanity_check():
                 print("Incorrect received data of value " + str(received_data))
             else:
                 print("Received correct data of " + str(data_to_receive))
+                # Make sure receive data is not equal to data_to_receive and buffer is clear
+                received_data = data_to_receive + 1
+                tvRemoteSAO.clear_ir_receive_buffer()
+                sleep(0.5)
                 # Constantly send IR data while seeing if we receive expected data back (Tests if the send and receive works )
                 print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + " and waiting for response of value " + str(data_to_receive)+ " at this SAO's address of " + str(this_sao_ir_address))
-                # Make sure receive data is not equal to data_to_receive
-                received_data = data_to_receive + 1
                 while(received_data != data_to_receive):
                     while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
                         tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
@@ -134,5 +135,5 @@ def sanity_check():
                     else:
                         print("Success! Sanity Test Passed, IR SAO communication works correctly")
                         print("---END---")
-
+    '''
 sanity_check()
