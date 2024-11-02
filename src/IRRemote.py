@@ -135,7 +135,7 @@ class IRRemoteSAO():
         time.sleep(self.seconds_delay)
 
 
-    def get_ir_receive_buffer_size(self) -> int:
+    def get_byte_count_in_ir_receive_buffer(self) -> int:
         """
         Get current size of IR receive buffer.
         """
@@ -158,7 +158,7 @@ class IRRemoteSAO():
         response = self.__read_i2c(1)
         return response
     
-    def write_ir_byte(self, address, data) -> None:
+    def write_ir_data_byte(self, address, data) -> None:
         """
         Use SAO to write an data byte with IR Transmitter.
         Accepts either a single character or an integer.
@@ -169,11 +169,11 @@ class IRRemoteSAO():
         elif not isinstance(data, int):
             raise ValueError("`data` must be a single character or an integer")
 
-        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address]) + bytes([data])
+        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address, data])
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
 
-    def write_ir_byte_raw(self, address, byte) -> None:
+    def write_ir_raw_byte(self, address, byte) -> None:
         """
         Use SAO to write raw byte data with IR Transmitter.
         """
@@ -182,7 +182,7 @@ class IRRemoteSAO():
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
 
-    def write_byte_to_ir_write_buffer(self, data) -> None:
+    def write_data_byte_to_ir_write_buffer(self, data) -> None:
         """
         Set SAO write cache address and byte.
         When Button is used, the IR Transmitter will send cached address and byte.
@@ -195,11 +195,11 @@ class IRRemoteSAO():
         elif not isinstance(data, int):
             raise ValueError("`data` must be a single character or an integer")
 
-        send = bytes([IRRemoteSAO.WRITE_TO_IR_WRITE_BUFFER_COMMAND_ID]) + data
+        send = bytes([IRRemoteSAO.WRITE_TO_IR_WRITE_BUFFER_COMMAND_ID, data])
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
     
-    def get_ir_write_buffer_size(self) -> int:
+    def get_byte_count_in_ir_write_buffer(self) -> int:
         """
         Get current size of IR write buffer.
         """
