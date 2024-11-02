@@ -21,7 +21,7 @@ class IRRemoteSAO():
     GET_IR_WRITE_BUFFER_ADDRESS_COMMAND_ID=15
 
 
-    def __init__(self, i2c, i2c_address=0x08, debug_logs=False, seconds_delay=1):
+    def __init__(self, i2c, i2c_address=0x08, debug_logs=False, seconds_delay=.5):
         self.i2c = i2c
         self.i2c_address = i2c_address
         self.debug_logs = debug_logs
@@ -156,13 +156,20 @@ class IRRemoteSAO():
         response = self.__read_i2c(1)
         return response
     
-    def write_ir_byte(self, address, byte) -> None:
+    def write_ir_byte(self, address, data) -> None:
         """
         Use SAO to write an byte with IR Transmitter.
+        Accepts either a single character or an integer.
         """
-        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address]) + byte
+        # If `byte` is a string (character), convert to its ASCII integer
+        if isinstance(data, str) and len(data) == 1:
+            byte = ord(data)
+        elif not isinstance(data, int):
+            raise ValueError("`data` must be a single character or an integer")
+
+        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address]) + bytes([byte])
         self.__send_i2c(send)
-        time.sleep(1)   
+        time.sleep(self.seconds_delay)
 
     def write_byte_to_ir_write_buffer(self, byte) -> None:
         """
@@ -172,7 +179,7 @@ class IRRemoteSAO():
         """
         send = bytes([IRRemoteSAO.WRITE_TO_IR_WRITE_BUFFER_COMMAND_ID]) + byte
         self.__send_i2c(send)
-        time.sleep(1)   
+        time.sleep(self.seconds_delay)
     
     def get_ir_write_buffer_size(self) -> int:
         """
@@ -191,6 +198,20 @@ class IRRemoteSAO():
         command_send = IRRemoteSAO.CLEAR_IR_WRITE_BUFFER_COMMAND_ID.to_bytes(1, 'little')
         self.__send_i2c(command_send)
         time.sleep(self.seconds_delay)
+
+    def get_ir_write_buffer(self, byte_count) -> bytes:
+        """
+        Get the SAO write cache.
+        Returns as Byte array with two bytes.
+        First Byte is Address, Second Byte is cache byte.
+
+        Note: Buffer is not cleared after.
+        """
+        command_send = IRRemoteSAO.GET_IR_WRITE_BUFFER_COMMAND_ID.to_bytes(1, 'little')
+        self.__send_i2c(command_send)
+        time.sleep(self.seconds_delay)
+        response = self.__read_i2c(byte_count)
+        return response
 
     def set_ir_write_buffer_address(self, ir_address) -> None:
         """
@@ -214,21 +235,5 @@ class IRRemoteSAO():
         time.sleep(self.seconds_delay)
         response = self.__read_i2c(1)
         return int.from_bytes(response, 'little') 
-
-
-
-    # TODO
-    def get_ir_write_buffer(self) -> bytes:
-        """
-        Get the SAO write cache.
-        Returns as Byte array with two bytes.
-        First Byte is Address, Second Byte is cache byte.
-        """
-        command_send = IRRemoteSAO.GET_IR_WRITE_BUFFER_COMMAND_ID.to_bytes(1, 'little')
-        self.__send_i2c(command_send)
-        time.sleep(self.seconds_delay)
-        response = self.__read_i2c(10)
-        return response
-        
         
  
