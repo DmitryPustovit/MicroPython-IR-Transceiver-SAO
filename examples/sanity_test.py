@@ -85,6 +85,7 @@ def sanity_check():
     received_data = data_to_receive + 1
 
     if send_first:
+        # Constantly send IR data while seeing if we receive expected data back (Tests if the send and receive works )
         print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + " and waiting for response of value " + str(data_to_receive)+ " at this SAO's address of " + str(this_sao_ir_address))
         while received_data != data_to_receive:
             while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
@@ -96,6 +97,7 @@ def sanity_check():
             if received_data != data_to_receive:
                 print("Incorrect received data of value " + str(received_data))
             else:
+                # Send 20 IR outputs (Validates that the other SAO transmit is working)
                 print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + ", note that this will only send 20 times before ending")
                 for i in range(0, 20):
                     tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
@@ -104,6 +106,7 @@ def sanity_check():
                 print("---END---")
 
     else:
+        # Constantly check to see if received IR data
         print("Waiting to receive IR data " + str(data_to_receive) + " at this SAO's address " + str(this_sao_ir_address))
         while(received_data != data_to_receive):
             while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
@@ -115,6 +118,7 @@ def sanity_check():
                 print("Incorrect received data of value " + str(received_data))
             else:
                 print("Received correct data of " + str(data_to_receive))
+                # Constantly send IR data while seeing if we receive expected data back (Tests if the send and receive works )
                 print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + " and waiting for response of value " + str(data_to_receive)+ " at this SAO's address of " + str(this_sao_ir_address))
                 # Make sure receive data is not equal to data_to_receive
                 received_data = data_to_receive + 1
