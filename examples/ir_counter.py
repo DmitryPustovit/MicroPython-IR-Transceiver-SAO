@@ -10,7 +10,7 @@ device_i2c_address = 0x08
 tvRemoteSAO = IRRemoteSAO(i2c, device_i2c_address, False)
 
 tvRemoteSAO.set_ir_mode(0)
-tvRemoteSAO.enable_ir_buffer(0)
+tvRemoteSAO.enable_ir_recieve_buffer(0)
 
 count = 0 
 polling_interval = 2000  # 2 seconds

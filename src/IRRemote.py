@@ -83,7 +83,7 @@ class IRRemoteSAO():
         if ir_mode not in (0, 1):
             raise ValueError("IR Mode must be either 0 (public mode) or 1 (address mode).")
 
-        send = bytes([IRRemoteSAO.SET_IR_ADDRESS_COMMAND_ID, ir_mode])
+        send = bytes([IRRemoteSAO.SET_IR_MODE_COMMAND_ID, ir_mode])
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
 
