@@ -38,6 +38,18 @@ tvRemoteSAO = IRRemoteSAO(i2c, device_i2c_address )
 print(tvRemoteSAO.ping())
 ```
 
+## Testing your board
+Using `examples/sanity_test.py` is a good way to test the core functionality of your board.  
+Note: This requires two SAO boards.   
+
+The program will ask you to input: 
+- Your SAO Address
+- Other boards SAO Address
+- Your Message
+- Other board's SAO Address 
+
+The script will verify that data is able to be sent and received.
+
 ## Sending and Recieving Data
 
 When IR data is recieved by the SAO, the data is stored in a buffer.  
@@ -74,8 +86,29 @@ for x in range(0, 10):
     tvRemoteSAO.write_ir_data_byte(0, x)
 ```
 
+## Avoiding Interference
+Setting your SAO to `Address` mode will ignore all receieved data bytes that do not contain the expected Address.
+
+```python
+i2c = machine.I2C(0, scl=machine.Pin(1), sda=machine.Pin(0))
+tvRemoteSAO = IRRemoteSAO( i2c, 0x08 )
+
+# Only received data with Address ID 9.
+tvRemoteSAO.set_ir_address(9) 
+```
+
+Every IR Transmission has an Address as the first byte.
+```python
+i2c = machine.I2C(0, scl=machine.Pin(1), sda=machine.Pin(0))
+tvRemoteSAO = IRRemoteSAO( i2c, 0x08 )
+
+# Send 42 to Address 9
+tvRemoteSAO.write_ir_data_byte(9, 42)
+```
+
 ## Development
-- Install Pico VS Code Extension: https://marketplace.visualstudio.com/items?itemName=raspberry-pi.raspberry-pi-pico
+- Install Pico VS Code Extension
+    - https://marketplace.visualstudio.com/items?itemName=raspberry-pi.raspberry-pi-pico
 - Upload `src/IRRemote.py` to pico
 - Now you can run any of the sample programs on the pico
 
