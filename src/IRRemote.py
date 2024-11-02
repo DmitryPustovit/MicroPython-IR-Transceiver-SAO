@@ -59,7 +59,7 @@ class IRRemoteSAO():
     def set_ignore_ir_reflection(self, ir_mode) -> None:
         """
         Set the IR reflection ignore option.
-        Prevents IR reciever from reading a transmission send by the SAO.
+        Prevents IR receiver from reading a transmission send by the SAO.
 
         0 = Disabled
         1 = Enable
@@ -87,10 +87,10 @@ class IRRemoteSAO():
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
 
-    def enable_ir_recieve_buffer(self, ir_mode) -> None:
+    def enable_ir_receive_buffer(self, ir_mode) -> None:
         """
         Enables or disables the ability to buffer IR data on the ATTINY85.
-        Used for both transimission and recieve.
+        Used for both transimission and receive.
         Note: clears the receive buffer when this is changed
 
         0 = Disabled
@@ -126,18 +126,18 @@ class IRRemoteSAO():
         response = self.__read_i2c(1)
         return int.from_bytes(response, 'little') 
     
-    def clear_ir_recieve_buffer(self) -> None:
+    def clear_ir_receive_buffer(self) -> None:
         """
-        Clear IR recieve buffer.
+        Clear IR receive buffer.
         """
         command_send = IRRemoteSAO.CLEAR_IR_RECEIVE_BUFFER_COMMAND_ID.to_bytes(1, 'little')
         self.__send_i2c(command_send)
         time.sleep(self.seconds_delay)
 
 
-    def get_ir_recieve_buffer_size(self) -> int:
+    def get_ir_receive_buffer_size(self) -> int:
         """
-        Get current size of IR recieve buffer.
+        Get current size of IR receive buffer.
         """
         command_send = IRRemoteSAO.GET_IR_RECEIVE_BUFFER_AVALIABLE_BYTES_COMMAND_ID.to_bytes(1, 'little')
         self.__send_i2c(command_send)
@@ -150,6 +150,8 @@ class IRRemoteSAO():
         Read byte from SAO.
         This will remove the byte from the buffer.
         """
+        #TODO: check for null data
+
         command_send = IRRemoteSAO.READ_IR_BYTE_COMMAND_ID.to_bytes(1, 'little')
         self.__send_i2c(command_send)
         time.sleep(self.seconds_delay)
@@ -158,26 +160,42 @@ class IRRemoteSAO():
     
     def write_ir_byte(self, address, data) -> None:
         """
-        Use SAO to write an byte with IR Transmitter.
+        Use SAO to write an data byte with IR Transmitter.
         Accepts either a single character or an integer.
         """
-        # If `byte` is a string (character), convert to its ASCII integer
+        # If `data` is a string (character), convert to its ASCII integer
         if isinstance(data, str) and len(data) == 1:
             byte = ord(data)
         elif not isinstance(data, int):
             raise ValueError("`data` must be a single character or an integer")
 
-        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address]) + bytes([byte])
+        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address]) + bytes([data])
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
 
-    def write_byte_to_ir_write_buffer(self, byte) -> None:
+    def write_ir_byte_raw(self, address, byte) -> None:
+        """
+        Use SAO to write raw byte data with IR Transmitter.
+        """
+
+        send = bytes([IRRemoteSAO.WRITE_IR_BYTE_COMMAND_ID, address]) + byte
+        self.__send_i2c(send)
+        time.sleep(self.seconds_delay)
+
+    def write_byte_to_ir_write_buffer(self, data) -> None:
         """
         Set SAO write cache address and byte.
         When Button is used, the IR Transmitter will send cached address and byte.
         Otherwise this cache is ignored.
+        Accepts either a single character or an integer.
         """
-        send = bytes([IRRemoteSAO.WRITE_TO_IR_WRITE_BUFFER_COMMAND_ID]) + byte
+        # If `data` is a string (character), convert to its ASCII integer
+        if isinstance(data, str) and len(data) == 1:
+            byte = ord(data)
+        elif not isinstance(data, int):
+            raise ValueError("`data` must be a single character or an integer")
+
+        send = bytes([IRRemoteSAO.WRITE_TO_IR_WRITE_BUFFER_COMMAND_ID]) + data
         self.__send_i2c(send)
         time.sleep(self.seconds_delay)
     
@@ -236,4 +254,3 @@ class IRRemoteSAO():
         response = self.__read_i2c(1)
         return int.from_bytes(response, 'little') 
         
- 
