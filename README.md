@@ -19,3 +19,9 @@ tvRemoteSAO = IRRemoteSAO(i2c, device_i2c_address )
 print(tvRemoteSAO.ping())
 ```
 
+## Development
+- Install Pico VS Code Extension: https://marketplace.visualstudio.com/items?itemName=raspberry-pi.raspberry-pi-pico
+- Upload `src/IRRemote.py` to pico
+- Now you can run any of the sample programs on the pico
+
+
