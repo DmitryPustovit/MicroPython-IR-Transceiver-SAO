@@ -93,7 +93,7 @@ def sanity_check():
                 print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
                 sleep(0.5)
             
-            received_data = tvRemoteSAO.read_ir_byte()
+            received_data = int.from_bytes(tvRemoteSAO.read_ir_byte(), 'big')
             if received_data != data_to_receive:
                 print("Incorrect received data of value " + str(received_data))
             else:
@@ -113,7 +113,7 @@ def sanity_check():
                 print("Waiting to receive data " + str(data_to_receive))
                 sleep(0.5)
                 
-            received_data = tvRemoteSAO.read_ir_byte()
+            received_data = int.from_bytes(tvRemoteSAO.read_ir_byte())
             if received_data != data_to_receive:
                 print("Incorrect received data of value " + str(received_data))
             else:
@@ -128,7 +128,7 @@ def sanity_check():
                         print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
                         sleep(0.5)
                     
-                    received_data = tvRemoteSAO.read_ir_byte()
+                    received_data = int.from_bytes(tvRemoteSAO.read_ir_byte())
                     if received_data != data_to_receive:
                         print("Incorrect received data of value " + str(received_data))
                     else:
