@@ -92,17 +92,21 @@ def sanity_check():
 
     # Constantly send IR data while seeing if we receive expected data back (Tests if the send and receive works )
     print("Sending IR data " + str(data_to_send) + " to IR Address " + str(target_sao_ir_address) + " and waiting for response of value " + str(data_to_receive)+ " at this SAO's address of " + str(this_sao_ir_address))
-    while received_data != data_to_receive:
-        while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
-            tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
-            print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
-            sleep(0.5)
-        
-        received_data = int.from_bytes(tvRemoteSAO.read_ir_byte(), 'big')
-        if received_data != data_to_receive:
-            print("Incorrect received data of value " + str(received_data))
-        else:
-            print("Success! This IR SAO works correctly for receiving! If the other SAO has sucess, transmitting works as well!")
+    try:
+        while True:
+            while(tvRemoteSAO.get_byte_count_in_ir_receive_buffer() < 1):
+                tvRemoteSAO.write_ir_data_byte(target_sao_ir_address, data_to_send)
+                print("Sending IR data " + str(data_to_send) + " to address " + str(target_sao_ir_address) + " again")
+                sleep(0.5)
+            
+            received_data = int.from_bytes(tvRemoteSAO.read_ir_byte(), 'big')
+            if received_data != data_to_receive:
+                print("Incorrect received data of value " + str(received_data))
+            else:
+                print("Success! This IR SAO works correctly for receiving! Will continue to transmit, if the other SAO has sucess transmitting works as well!")
+    except KeyboardInterrupt:
+        print("Interrupted")
+
     '''
     else:
         # Constantly check to see if received IR data
