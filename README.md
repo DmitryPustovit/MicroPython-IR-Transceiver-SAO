@@ -62,6 +62,18 @@ The SAO has a max recieve buffer of 128 bytes.
 tvRemoteSAO.enable_ir_recieve_buffer(1)
 ```
 
+Writing data is simple. The following will transmit the number 1 to 10.  
+```python
+import machine
+from IRRemote import IRRemoteSAO
+
+i2c = machine.I2C(0, scl=machine.Pin(1), sda=machine.Pin(0))
+tvRemoteSAO = IRRemoteSAO( i2c, 0x08 )
+
+for x in range(0, 10): 
+    tvRemoteSAO.write_ir_data_byte(0, x)
+```
+
 ## Development
 - Install Pico VS Code Extension: https://marketplace.visualstudio.com/items?itemName=raspberry-pi.raspberry-pi-pico
 - Upload `src/IRRemote.py` to pico
